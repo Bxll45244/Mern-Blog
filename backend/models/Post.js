@@ -9,6 +9,6 @@ const PostSchema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: "User" },
 });
 
-
+//สร้างModel
 const PostModel = model("Post", PostSchema);
 module.exports = PostModel;
