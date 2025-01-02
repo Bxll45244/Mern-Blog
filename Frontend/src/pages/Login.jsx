@@ -1,44 +1,85 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
+import AuthService from "../services/auth.service";
+import { useNavigate } from "react-router";
+import Swal from "sweetalert2";
+import { useAuthContext } from "../context/AuthContext";
 
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-
-    // Basic validation
-    if (!username || !password) {
-      setError("Please fill in both fields");
-      return;
+  const [user, setUser] = useState({
+    username: "",
+    password: "",
+  });
+  const { login, user: loggedUser } = useAuthContext();
+  useEffect(() => {
+    if (loggedUser) {
+      navigate("/");
     }
-
-    setError(""); // Clear error message
-
-    // Handle the form submission (typically for API calls)
-    console.log("Logged in with:", username, password);
+  }, [loggedUser]);
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setUser((user) => ({ ...user, [name]: value }));
   };
-
+  const handleSubmit = async () => {
+    try {
+      const currentUser = await AuthService.login(user.username, user.password);
+      console.log(currentUser.status);
+      if (currentUser.status === 200) {
+        Swal.fire({
+          title: "User Login",
+          text: currentUser.data.message,
+          icon: "success",
+        }).then(() => {
+          login(currentUser.data);
+          navigate("/");
+        });
+        setUser({
+          username: "",
+          password: "",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        title: "User Login",
+        text: error?.response?.data?.message || error.message,
+        icon: "error",
+      });
+    }
+  };
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-96">
-        <h2 className="text-2xl font-semibold text-center mb-6">Login</h2>
-        <form onSubmit={handleLogin} className="space-y-4">
-          {/* Username Input */}
-          <div className="relative">
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-sm w-full">
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+          Login
+        </h2>
+        <div className="mb-4">
+          {" "}
+          <label className="input input-bordered flex items-center gap-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              className="h-4 w-4 opacity-70"
+            >
+              <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
+            </svg>
             <input
               type="text"
-              className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
+              className="grow"
+              name="username"
               placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={user.username}
+              onChange={handleChange}
             />
+          </label>
+        </div>
+        <div className="mb-6">
+          <label className="input input-bordered flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 16 16"
               fill="currentColor"
-              className="absolute left-3 top-3 h-5 w-5 opacity-70"
+              className="h-4 w-4 opacity-70"
             >
               <path
                 fillRule="evenodd"
@@ -46,42 +87,24 @@ const Login = () => {
                 clipRule="evenodd"
               />
             </svg>
-          </div>
-
-          {/* Password Input */}
-          <div className="relative">
             <input
               type="password"
-              className="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              className="grow"
+              value={user.password}
+              name="password"
+              onChange={handleChange}
             />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 16 16"
-              fill="currentColor"
-              className="absolute left-3 top-3 h-5 w-5 opacity-70"
-            >
-              <path
-                fillRule="evenodd"
-                d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-
-          {/* Error Message */}
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          {/* Submit Button */}
+          </label>
+        </div>
+        <div className="flex items-center justify-between">
           <button
             type="submit"
-            className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+            onClick={handleSubmit}
+            className="btn btn-outline btn-primary py-2 px-4 rounded"
           >
             Login
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );
