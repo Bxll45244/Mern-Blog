@@ -31,5 +31,25 @@ function checkFileType(file, cb) {
     cb("Error: Image Only!");
   }
 }
+//upload to firebase storage
+
+// async function uploadToFirebase(req, res, next) {
+//   if (!req.file) {
+//     return res.status(400).json ({ message: "Image is required"});
+//   }
+//   //save location 
+//   const storageRef =  ref(firebaseStorage, ``)
+// }
+
+// try {
+//   const snapshot = await uploadBytesResumable(storageRef, req.file, metadata);
+//   req.file.firebaseUrl =  await getDownloadURL(snapshot.ref);
+//   naxt();
+// } catch (error) {
+//   res.status(500).json({
+//     message: 
+//     error.message || "Something wen  wrong while uploading to firebase",
+//   });
+// }
 
 module.exports = { upload };
