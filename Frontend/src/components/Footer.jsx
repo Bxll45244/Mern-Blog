@@ -1,8 +1,6 @@
-import React from "react";
-
 const Footer = () => {
   return (
-    <footer className="footer bg-neutral text-neutral-content items-center p-4">
+    <footer className="footer bg-gray-800 text-gray-300 items-center p-4"> {/* เปลี่ยนเป็น bg-gray-800 และ text-gray-300 */}
       <aside className="grid-flow-col items-center">
         <svg
           width="36"

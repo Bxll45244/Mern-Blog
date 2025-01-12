@@ -11,6 +11,7 @@ const Post = () => {
   const { user } = useAuthContext();
   const { id } = useParams();
   const navigate = useNavigate();
+
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -28,6 +29,7 @@ const Post = () => {
     };
     fetchPost();
   }, [id]);
+
   const handleDelete = (id) => {
     Swal.fire({
       title: "Delete Post ",
@@ -49,7 +51,12 @@ const Post = () => {
       }
     });
   };
+
   if (!postDetail) return <div>Not Found</div>;
+
+  const userId = user?.id?.toString(); // Ensure user.id is string
+  const authorId = postDetail?.author?._id?.toString(); // Ensure post author._id is string
+
   return (
     <div className="post-page min-h-full min-w-full flex items-center justify-center p-4 pt-20">
       <div className="bg-white p-8 rounded-lg shadow-lg max-4xl w-full">
@@ -64,7 +71,7 @@ const Post = () => {
             <span className="text-blue-500">@{postDetail.author.username}</span>
           </div>
         </div>
-        {user.id === postDetail.author._id && (
+        {userId === authorId && ( // Ensure the comparison works
           <div className="edit-row mb-4 text-center flex items-center justify-center gap-2">
             <a href={`/edit/${postDetail._id}`} className="btn btn-warning">
               Edit Post
